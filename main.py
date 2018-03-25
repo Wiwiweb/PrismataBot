@@ -1,3 +1,7 @@
+import logging
+from logging.handlers import TimedRotatingFileHandler
+import sys
+
 from configparser import ConfigParser
 import irc.bot
 
@@ -6,6 +10,15 @@ SECRETS_FILE_PRIVATE = "cfg/secrets.ini"
 config = ConfigParser()
 config.read([CONFIG_FILE, SECRETS_FILE_PRIVATE])
 
+log = logging.getLogger('PrismataBot')
+file_handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
+file_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s - %(message)s'))
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+log.addHandler(file_handler)
+log.addHandler(console_handler)
+log.setLevel(logging.DEBUG)
+
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
@@ -13,11 +26,11 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         self.channel = channel
 
     def on_welcome(self, connection, event):
-        print('connected')
+        log.info('Connected to Twitch IRC server')
         connection.join(self.channel)
 
     def on_join(self, connection, event):
-        print('joined')
+        log.info('Joined channel ' + self.channel)
 
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
@@ -25,16 +38,17 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.printPrismataUnit(connection, msg[1])
 
     def on_disconnect(self, connection, event):
-        print('disconnected: ' + event.arguments[0])
+        log.info('Disconnected (channel ' + self.channel + ')')
         raise SystemExit()
 
     def printPrismataUnit(self, connection, query):
+        log.info('Answering !unit ' + query)
         connection.privmsg(self.channel, "You asked for this: " + query)
 
 
 def main():
     if not config['Passwords']['IRC']:
-        print("Didn't set up secrets.ini")
+        log.error("Didn't set up secrets.ini")
         return
     bot = PrismataBot(config['Twitch']['channel'],
                       config['Twitch']['nickname'],
@@ -45,5 +59,5 @@ def main():
 
 
 if __name__ == '__main__':
-    print('start')
+    log.info('=== Starting PrismataBot ===')
     main()
