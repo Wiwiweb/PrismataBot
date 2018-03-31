@@ -78,10 +78,9 @@ def get_attributes_tooltip(unit_json):
     if 'frontline' in unit_json:
         attributes += ['Frontline']
     if 'defaultBlocking' in unit_json and unit_json['defaultBlocking']:
-        if 'assignedBlocking' in unit_json and not unit_json['assignedBlocking']:
-            attributes += ['Blocker']
-        else:
-            attributes += ['Prompt Blocker']
+        if unit_json['buildTime'] == 0:
+            attributes += ['Prompt']
+        attributes += ['Blocker']
     return ' '.join(attributes)
 
 
