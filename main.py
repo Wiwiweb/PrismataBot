@@ -1,3 +1,6 @@
+from difflib import get_close_matches
+from difflib import SequenceMatcher
+import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
@@ -19,6 +22,7 @@ log.addHandler(file_handler)
 log.addHandler(console_handler)
 log.setLevel(logging.DEBUG)
 
+tooltips = json.load(open(config['Files']['unit_tooltips']))
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
@@ -35,21 +39,29 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
         if len(msg) == 2 and len(msg[1]) > 0 and (msg[0].startswith('!unit') or msg[0].startswith('!prismata')):
-            self.printPrismataUnit(connection, msg[1])
+            self.answer_command(connection, msg[1])
 
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel ' + self.channel + ')')
         raise SystemExit()
 
-    def printPrismataUnit(self, connection, query):
+    def answer_command(self, connection, query):
         log.info('Answering !unit ' + query)
-        connection.privmsg(self.channel, "You asked for this: " + query)
+        tooltip_key = get_close_matches(query, tooltips.keys(), 1, 0.3)
+        if tooltip_key:
+            tooltip_key = tooltip_key[0]
+            log.debug('Closest match: {} with {}'.format(tooltip_key, SequenceMatcher(None, query, tooltip_key).ratio()))
+            connection.privmsg(self.channel, '{}: {}'.format(tooltip_key, tooltips[tooltip_key]))
+        else:
+            log.debug('Not found')
+            connection.privmsg(self.channel, "Couldn't find a unit for {}!".format(query))
 
 
 def main():
     if not config['Passwords']['IRC']:
         log.error("Didn't set up secrets.ini")
         return
+
     bot = PrismataBot(config['Twitch']['channel'],
                       config['Twitch']['nickname'],
                       config['Twitch']['server'],
