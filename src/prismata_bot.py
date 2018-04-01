@@ -1,28 +1,13 @@
-from difflib import get_close_matches
-from difflib import SequenceMatcher
 import json
-import logging
-from logging.handlers import TimedRotatingFileHandler
-import sys
+from difflib import SequenceMatcher
+from difflib import get_close_matches
 
-from configparser import ConfigParser
 import irc.bot
 
-CONFIG_FILE = "cfg/config.ini"
-SECRETS_FILE_PRIVATE = "cfg/secrets.ini"
-config = ConfigParser()
-config.read([CONFIG_FILE, SECRETS_FILE_PRIVATE])
-
-log = logging.getLogger('PrismataBot')
-file_handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
-file_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s - %(message)s'))
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
-log.addHandler(file_handler)
-log.addHandler(console_handler)
-log.setLevel(logging.DEBUG)
+from globals import config, log
 
 tooltips = json.load(open(config['Files']['unit_tooltips']))
+
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
@@ -55,21 +40,3 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         else:
             log.debug('Not found')
             connection.privmsg(self.channel, "Couldn't find a unit for {}!".format(query))
-
-
-def main():
-    if not config['Passwords']['IRC']:
-        log.error("Didn't set up secrets.ini")
-        return
-
-    bot = PrismataBot(config['Twitch']['channel'],
-                      config['Twitch']['nickname'],
-                      config['Twitch']['server'],
-                      int(config['Twitch']['port']),
-                      config['Passwords']['IRC'])
-    bot.start()
-
-
-if __name__ == '__main__':
-    log.info('=== Starting PrismataBot ===')
-    main()
