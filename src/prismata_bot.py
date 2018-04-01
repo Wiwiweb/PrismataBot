@@ -8,30 +8,31 @@ from globals import config, log
 
 tooltips = json.load(open(config['Files']['unit_tooltips']))
 
-
 class PrismataBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, channel, nickname, server, port, password):
+    def __init__(self, nickname, server, port, password):
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, password)], nickname, nickname)
-        self.channel = channel
 
     def on_welcome(self, connection, event):
         log.info('Connected to Twitch IRC server')
-        connection.join(self.channel)
 
     def on_join(self, connection, event):
-        log.info('Joined channel ' + self.channel)
+        log.info('Joined channel ' + event.target)
 
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
         if len(msg) == 2 and len(msg[1]) > 0 and (msg[0].startswith('!unit') or msg[0].startswith('!prismata')):
-            self.answer_command(connection, msg[1])
+            self.answer_command(connection, msg[1], event.target)
 
     def on_disconnect(self, connection, event):
-        log.info('Disconnected (channel ' + self.channel + ')')
+        log.info('Disconnected (channel {}'.format(event.target))
         raise SystemExit()
 
-    def answer_command(self, connection, query):
-        log.info('Answering !unit ' + query)
+    def join_channel(self, channel):
+        log.info('test')
+        self.connection.join(channel)
+
+    def answer_command(self, connection, query, channel):
+        log.info('Answering !unit {} in channel {}'.format(query, channel))
         tooltip_key = get_close_matches(query, tooltips.keys(), 1, 0.3)
         if tooltip_key:
             tooltip_key = tooltip_key[0]
