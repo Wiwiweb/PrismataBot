@@ -9,14 +9,16 @@ from globals import config, log
 tooltips = json.load(open(config['Files']['unit_tooltips']))
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, nickname, server, port, password):
+    def __init__(self, channel, nickname, server, port, password):
+        log.info('Creating new bot for channel ' + channel)
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, password)], nickname, nickname)
+        self.channel = channel
 
     def on_welcome(self, connection, event):
-        log.info('Connected to Twitch IRC server')
+        connection.join(self.channel)
 
     def on_join(self, connection, event):
-        log.info('Joined channel ' + event.target)
+        log.info('New bot joined channel ' + event.target)
 
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
@@ -26,10 +28,6 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {}'.format(event.target))
         raise SystemExit()
-
-    def join_channel(self, channel):
-        log.info('test')
-        self.connection.join(channel)
 
     def answer_command(self, connection, query, channel):
         log.info('Answering !unit {} in channel {}'.format(query, channel))
