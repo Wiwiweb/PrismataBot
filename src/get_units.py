@@ -6,7 +6,7 @@ import sys
 from configparser import ConfigParser
 import requests
 
-CONFIG_FILE = 'cfg/config.ini'
+CONFIG_FILE = '../cfg/config.ini'
 UNIT_INFO_URL = 'https://s3.amazonaws.com/lunarch_blog/Units/public+json.txt'
 
 config = ConfigParser()
@@ -120,42 +120,41 @@ def get_start_of_turn_tooltip(unit_json, unit_name):
 
 
 def get_click_tooltip(unit_json, unit_name):
-    effects = []
+    costs = []
+    gains = []
     if 'healthCostToClick' in unit_json:
-        effects += ['pay ' + str(unit_json['healthCostToClick']) + 'HP']
+        costs += ['pay ' + str(unit_json['healthCostToClick']) + 'HP']
     if 'abilityCost' in unit_json:
-        effects += ['pay ' + unit_json['abilityCost']]
+        costs += ['pay ' + unit_json['abilityCost']]
     if 'abilitySac' in unit_json:
-        effects += get_sacrifice_effects(unit_json['abilitySac'])
+        costs += get_sacrifice_effects(unit_json['abilitySac'])
 
     if 'abilityScript' in unit_json and len(unit_json['abilityScript']) > 0:
         if 'selfsac' in unit_json['abilityScript']:
-            effects += ['sacrifice ' + unit_name]
-        effects += get_script_effects(unit_json['abilityScript'])
+            costs += ['sacrifice ' + unit_name]
+        gains += get_script_effects(unit_json['abilityScript'])
 
     if 'targetAction' in unit_json:
         if 'chill' in unit_json['targetAction']:
-            effects += ['chill ' + str(unit_json['targetAmount'])]
+            gains += ['chill ' + str(unit_json['targetAmount'])]
         elif 'snipe' in unit_json['targetAction']:
             if 'healthAtMost' in unit_json['targetCondition']:
                 health_requirement = unit_json['targetCondition']['healthAtMost']
-                effects += ['destroy an enemy unit with ' + str(health_requirement) + ' or less health']
+                gains += ['destroy an enemy unit with ' + str(health_requirement) + ' or less health']
             if 'isABC' in unit_json['targetCondition']:
-                effects += ['destroy an enemy Animus, Blastforge, or Conduit']
+                gains += ['destroy an enemy Animus, Blastforge, or Conduit']
     if 'clickToDestroyNonblockingDrone' in unit_json:
-        effects += ['destroy a non-blocking enemy Drone']
+        gains += ['destroy a non-blocking enemy Drone']
 
     tooltip = None
-    if len(effects) > 0:
-        tooltip = join_and_to(effects)
+    if len(costs) > 0 or len(gains) > 0:
+        tooltip = join_and_to(costs, gains)
         tooltip = 'Click: ' + tooltip[0].upper() + tooltip[1:]
     return tooltip
 
 
 def get_script_effects(script):
     effects = []
-    if 'delay' in script:
-        effects += ['Exhaust' + str(script['delay'])]
     if 'receive' in script:
         effects += ['gain ' + script['receive']]
     if 'create' in script:
@@ -174,12 +173,14 @@ def get_script_effects(script):
             if 'forOpponent' in create_unit and create_unit['forOpponent']:
                 create_effect += ' for your opponent'
             effects += [create_effect]
+    if 'delay' in script:
+        effects += ['Exhaust' + str(script['delay'])]
     return effects
 
 
 def save_tooltip_json(unit_tooltips_json):
     with open(config['Files']['unit_tooltips'], 'w') as outfile:
-        json.dump(unit_tooltips_json, outfile, sort_keys=True, indent=2, separators=(',', ': '))
+        json.dump(unit_tooltips_json, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def get_sacrifice_effects(sacrifice_script):
@@ -191,11 +192,11 @@ def get_sacrifice_effects(sacrifice_script):
     return effects
 
 
-def join_and_to(effects):
-    if len(effects) < 2:
-        return ' and '.join(effects)
+def join_and_to(costs, gains):
+    if len(costs) == 0:
+        return ' and '.join(gains)
     else:
-        return ' and '.join(effects[:-1]) + ' to ' + effects[-1]
+        return ' and '.join(costs) + ' to ' + ' and '.join(gains)
 
 
 def number_grammar(number):
