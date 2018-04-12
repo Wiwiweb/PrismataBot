@@ -5,6 +5,6 @@ if [ -n "$BOTPID" ]; then
   echo "Running correctly."
 else
   echo "ERROR: Script stopped."
-  tail -n 10 /home/ec2-user/nohup.out
+  tail -n 10 /home/ec2-user/PrismataBot/nohup.out
   exit 1
 fi

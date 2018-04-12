@@ -13,7 +13,7 @@ git pull
 
 # Start
 echo "Starting"
-cd src
+cd ../src
 nohup python3 bot_manager.py > ../nohup.out 2>&1 &
 disown
 
