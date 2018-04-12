@@ -20,7 +20,7 @@ for tooltip_dict_name in tooltips:
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
-        log.info('Creating new bot for channel ' + channel)
+        channel = '#' + channel
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, password)], nickname, nickname)
         self.channel = channel
 
