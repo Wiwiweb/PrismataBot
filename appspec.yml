@@ -7,6 +7,7 @@ hooks:
   ApplicationStart:
     - location: start-ec2.sh
       timeout: 60
+      runas: root
   ValidateService:
     - location: validate-ec2.sh
       timeout: 180
