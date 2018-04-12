@@ -1,2 +1,3 @@
 cfg/secrets.ini
 .idea
+src/__pycache__
