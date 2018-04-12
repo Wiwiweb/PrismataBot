@@ -1,6 +1,12 @@
 version: 0.0
 os: linux
+files:
+  - source: /
+    destination: /home/ec2-user/PrismataBot
 hooks:
   ApplicationStart:
     - location: start-ec2.sh
       timeout: 60
+  ValidateService:
+    - location: validate-ec2.sh
+      timeout: 180
