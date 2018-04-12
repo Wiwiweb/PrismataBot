@@ -1,0 +1,6 @@
+version: 0.0
+os: linux
+hooks:
+  ApplicationStart:
+    - location: start-ec2.sh
+      timeout: 60
