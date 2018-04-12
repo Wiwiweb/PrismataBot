@@ -24,5 +24,9 @@ if [ -n "$BOTPID" ]; then
   echo "Running correctly."
 else
   echo "ERROR: Script stopped."
-  tail -n 10 ../nohup.out
+  echo "=== Nohup: ==="
+  tail -n 10 /home/ec2-user/PrismataBot/nohup.out
+  echo "=== Bot log: ==="
+  tail -n 10 /home/ec2-user/PrismataBot/logs/prismatabot.log
+  exit 1
 fi
