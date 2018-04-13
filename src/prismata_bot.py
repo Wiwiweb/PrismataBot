@@ -1,6 +1,5 @@
 import json
-from difflib import SequenceMatcher
-from difflib import get_close_matches
+from difflib import SequenceMatcher, get_close_matches
 
 import irc.bot
 import random
@@ -31,30 +30,39 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         self.channel = channel
 
     def on_welcome(self, connection, event):
+        connection.cap('REQ', ':twitch.tv/tags')  # Request display-names in messages
         connection.join(self.channel)
 
     def on_join(self, connection, event):
         log.debug('New bot joined channel ' + event.target)
 
     def on_pubmsg(self, connection, event):
-        msg = event.arguments[0].split(' ', 1)
+        text = event.arguments[0]
+        msg = text.split(' ', 1)
+
+        username = ''
+        for tag in event.tags:  # Iterating through to find the key because this gives us a list instead of a dict...
+            if tag['key'] == 'display-name':
+                username = tag['value']
+
         if msg[0].startswith('!prismata'):
-            self.answer_unit_command(msg[1], event.target)
+            log.info('Answering {} in channel {} from user {}'.format(text, self.channel, username))
+            self.answer_unit_command(msg[1])
         elif msg[0].startswith('!unit'):
+            log.info('Answering {} in channel {} from user {}'.format(text, self.channel, username))
             if len(msg) == 2 and len(msg[1]) > 0:
-                self.answer_unit_command(msg[1], event.target)
+                self.answer_unit_command(msg[1])
             else:
                 self.chat('You need to type a unit name FailFish')
         elif msg[0].startswith('@PrismataBot'):
-            self.answer_hello_command()
+            self.answer_hello_command(username)
 
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {}'.format(event.target))
         log.debug(event)
         raise SystemExit()
 
-    def answer_unit_command(self, query, channel):
-        log.info('Answering !unit {} in channel {}'.format(query, channel))
+    def answer_unit_command(self, query):
         tooltip_key = get_close_matches(query, tooltip_key_to_name.keys(), 1, 0.4)
         if tooltip_key:
             tooltip_key = tooltip_key[0]
@@ -67,8 +75,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             log.debug('Not found')
             self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
 
-    def answer_prismata_command(self, query, channel):
-        log.info('Answering !prismata {} in channel {}'.format(query, channel))
+    def answer_prismata_command(self, query):
         if query is None or query == '':
             query = 'prismata'
         tooltip_key = get_close_matches(query, prismata_responses.keys(), 1, 0.5)
@@ -83,10 +90,9 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             query_list = prismata_responses.keys().join(', ')
             self.chat("I don't have anything to say about that FrankerZ I can talk about: {}".format(query_list))
 
-    def answer_hello_command(self):
+    def answer_hello_command(self, username):
         faces = ['HeyGuys', 'VoHiYo', 'KonCha', 'MrDestructoid', 'OhMyDog', 'FrankerZ', 'RalpherZ']
-        self.chat(format(random.choice(faces)))
+        self.chat('@{} {}'.format(username, random.choice(faces)))
 
     def chat(self, message):
         self.connection.privmsg(self.channel, message)
-
