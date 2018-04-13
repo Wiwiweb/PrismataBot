@@ -3,6 +3,7 @@ from difflib import SequenceMatcher
 from difflib import get_close_matches
 
 import irc.bot
+import random
 
 from globals import config, log
 
@@ -44,6 +45,8 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
                 self.answer_unit_command(msg[1], event.target)
             else:
                 self.chat('You need to type a unit name FailFish')
+        elif msg[0].startswith('@PrismataBot'):
+            self.answer_hello_command()
 
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {}'.format(event.target))
@@ -79,6 +82,10 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             log.debug('Not found')
             query_list = prismata_responses.keys().join(', ')
             self.chat("I don't have anything to say about that FrankerZ I can talk about: {}".format(query_list))
+
+    def answer_hello_command(self):
+        faces = ['HeyGuys', 'VoHiYo', 'KonCha', 'MrDestructoid', 'OhMyDog', 'FrankerZ', 'RalpherZ']
+        self.chat(format(random.choice(faces)))
 
     def chat(self, message):
         self.connection.privmsg(self.channel, message)
