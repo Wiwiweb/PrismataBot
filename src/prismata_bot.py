@@ -20,6 +20,8 @@ for tooltip_dict_name in tooltips:
 custom_tooltips = json.load(open(config['Files']['custom_tooltip_matches']))
 tooltip_key_to_name = {**tooltip_key_to_name, **custom_tooltips}  # Merge both dictionaries
 
+prismata_responses = json.load(open(config['Files']['unit_tooltips']))
+
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
@@ -35,15 +37,20 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
 
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
-        if len(msg) == 2 and len(msg[1]) > 0 and (msg[0].startswith('!unit') or msg[0].startswith('!prismata')):
-            self.answer_command(connection, msg[1], event.target)
+        if msg[0].startswith('!prismata'):
+            self.answer_unit_command(msg[1], event.target)
+        elif msg[0].startswith('!unit'):
+            if len(msg) == 2 and len(msg[1]) > 0:
+                self.answer_unit_command(msg[1], event.target)
+            else:
+                self.chat('You need to type a unit name FailFish')
 
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {}'.format(event.target))
         log.debug(event)
         raise SystemExit()
 
-    def answer_command(self, connection, query, channel):
+    def answer_unit_command(self, query, channel):
         log.info('Answering !unit {} in channel {}'.format(query, channel))
         tooltip_key = get_close_matches(query, tooltip_key_to_name.keys(), 1, 0.4)
         if tooltip_key:
@@ -52,7 +59,27 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             log.debug('Closest match: {}->{}->{} with {}'
                       .format(query, tooltip_key, tooltip_name,
                               round(SequenceMatcher(None, query, tooltip_key).ratio(), 2)))
-            connection.privmsg(self.channel, '{}: {}'.format(tooltip_name, tooltips[tooltip_name]))
+            self.chat('{}: {}'.format(tooltip_name, tooltips[tooltip_name]))
         else:
             log.debug('Not found')
-            connection.privmsg(self.channel, "Couldn't find a unit for {}!".format(query))
+            self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
+
+    def answer_prismata_command(self, query, channel):
+        log.info('Answering !prismata {} in channel {}'.format(query, channel))
+        if query is None or query == '':
+            query = 'prismata'
+        tooltip_key = get_close_matches(query, prismata_responses.keys(), 1, 0.5)
+        if tooltip_key:
+            tooltip_key = tooltip_key[0]
+            log.debug('Closest match: {}->{} with {}'
+                      .format(query, tooltip_key,
+                              round(SequenceMatcher(None, query, tooltip_key).ratio(), 2)))
+            self.chat(prismata_responses[tooltip_key])
+        else:
+            log.debug('Not found')
+            query_list = prismata_responses.keys().join(', ')
+            self.chat("I don't have anything to say about that FrankerZ I can talk about: {}".format(query_list))
+
+    def chat(self, message):
+        self.connection.privmsg(self.channel, message)
+
