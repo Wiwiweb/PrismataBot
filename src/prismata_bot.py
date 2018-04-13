@@ -45,11 +45,12 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             if tag['key'] == 'display-name':
                 username = tag['value']
 
-        if msg[0].startswith('!prismata'):
+        if msg[0].startswith(('!prismata', '!unit', '@PrismataBot')):
             log.info('Answering {} in channel {} from user {}'.format(text, self.channel, username))
+
+        if msg[0].startswith('!prismata'):
             self.answer_unit_command(msg[1])
         elif msg[0].startswith('!unit'):
-            log.info('Answering {} in channel {} from user {}'.format(text, self.channel, username))
             if len(msg) == 2 and len(msg[1]) > 0:
                 self.answer_unit_command(msg[1])
             else:

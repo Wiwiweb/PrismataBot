@@ -43,4 +43,4 @@ if not config['Secrets']['IRC_password']:
         log.info("Secrets loaded from SSM")
     except NoCredentialsError:
         log.error("Couldn't load secrets!")
-        quit()
+        raise SystemExit()
