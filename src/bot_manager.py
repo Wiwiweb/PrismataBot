@@ -30,7 +30,7 @@ def bot_manager_loop():
 
 def get_prismata_streams():
     body = requests.get(TWITCH_ENDPOINT).json()
-    if 'stream' not in body:
+    if 'streams' not in body:
         log.error("Twitch API error : {}".format(body))
     channel_list = [stream['channel']['name'] for stream in body['streams']]
     return channel_list
