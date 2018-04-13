@@ -19,12 +19,13 @@ log.addHandler(file_handler)
 log.setLevel(logging.DEBUG)
 
 # Config secrets
-if 'Secrets' not in config or not config['Secrets']['IRC_password']:
+if 'Secrets' not in config:
+    config.add_section('Secrets')
+if not config['Secrets']['IRC_password']:
     try:
         ssm = boto3.client('ssm', region_name=config['AWS']['region'])
         response = ssm.get_parameters(Names=['IRC_password', 'Twitch_client_id'],
                                       WithDecryption=True)
-        config.add_section('Secrets')
         config.set('Secrets', 'IRC_password', response['Parameters'][0]['Value'])
         config.set('Secrets', 'Twitch_client_id', response['Parameters'][0]['Value'])
         log.info("Secrets loaded from SSM")
