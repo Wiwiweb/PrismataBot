@@ -3,7 +3,7 @@ from time import sleep
 
 import requests
 
-from globals import config, log
+from globals import config, log, test_mode
 from prismata_bot import PrismataBot
 
 TWITCH_ENDPOINT = 'https://api.twitch.tv/kraken/streams?game=Prismata&client_id={}'\
@@ -32,6 +32,8 @@ def bot_manager_loop():
 
 
 def get_prismata_streams():
+    if test_mode:
+        return ['wiwiweb']
     body = requests.get(TWITCH_ENDPOINT).json()
     if 'streams' not in body:
         log.error("Twitch API error : {}".format(body))

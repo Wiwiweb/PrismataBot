@@ -1,9 +1,17 @@
+import logging
+import sys
+
+from configparser import ConfigParser
 from logging.handlers import TimedRotatingFileHandler
 import boto3
 from botocore.exceptions import NoCredentialsError
 
-from configparser import ConfigParser
-import logging
+# Test mode
+if len(sys.argv) > 1 and '--test' in sys.argv:
+    print("=== TEST MODE ===")
+    test_mode = True
+else:
+    test_mode = False
 
 # Config
 CONFIG_FILE = "../cfg/config.ini"
@@ -13,10 +21,14 @@ config.read([CONFIG_FILE, SECRETS_FILE_PRIVATE])
 
 # Logger
 log = logging.getLogger('PrismataBot')
-file_handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
-file_handler.setFormatter(logging.Formatter('%(asctime)s: %(levelname)s - %(message)s'))
-log.addHandler(file_handler)
 log.setLevel(logging.DEBUG)
+log_format = '%(asctime)s: %(levelname)s - %(message)s'
+if test_mode:
+    handler = logging.StreamHandler(sys.stdout)
+else:
+    handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
+handler.setFormatter(logging.Formatter(log_format))
+log.addHandler(handler)
 
 # Config secrets
 if 'Secrets' not in config:
