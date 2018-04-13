@@ -20,6 +20,9 @@ def bot_manager_loop():
         new_channels = channel_set - existing_bots_set
         ended_channels = existing_bots_set - channel_set
 
+        if len(new_channels) > 0 or len(ended_channels) > 0:
+            log.debug("Existing channels: {} - Existing bots: {}".format(channel_set, existing_bots_set))
+
         for new_channel in new_channels:
             create_new_bot(new_channel)
         for ended_channel in ended_channels:

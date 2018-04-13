@@ -31,7 +31,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         connection.join(self.channel)
 
     def on_join(self, connection, event):
-        log.info('New bot joined channel ' + event.target)
+        log.debug('New bot joined channel ' + event.target)
 
     def on_pubmsg(self, connection, event):
         msg = event.arguments[0].split(' ', 1)
