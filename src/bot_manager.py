@@ -17,7 +17,6 @@ def bot_manager_loop():
     while True:
         channel_set = set(get_prismata_streams())
         existing_bots_set = set(processes.keys())
-        log.debug("Existing channels: {} - Existing bots: {}".format(channel_set, existing_bots_set))
         new_channels = channel_set - existing_bots_set
         ended_channels = existing_bots_set - channel_set
 
@@ -31,6 +30,8 @@ def bot_manager_loop():
 
 def get_prismata_streams():
     body = requests.get(TWITCH_ENDPOINT).json()
+    if 'stream' not in body:
+        log.error("Twitch API error : {}".format(body))
     channel_list = [stream['channel']['name'] for stream in body['streams']]
     return channel_list
 

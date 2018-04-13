@@ -27,7 +27,7 @@ if not config['Secrets']['IRC_password']:
         response = ssm.get_parameters(Names=['IRC_password', 'Twitch_client_id'],
                                       WithDecryption=True)
         config.set('Secrets', 'IRC_password', response['Parameters'][0]['Value'])
-        config.set('Secrets', 'Twitch_client_id', response['Parameters'][0]['Value'])
+        config.set('Secrets', 'Twitch_client_id', response['Parameters'][1]['Value'])
         log.info("Secrets loaded from SSM")
     except NoCredentialsError:
         log.error("Couldn't load secrets!")
