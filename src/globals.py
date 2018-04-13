@@ -1,5 +1,6 @@
 import logging
 import sys
+from traceback import format_tb
 
 from configparser import ConfigParser
 from logging.handlers import TimedRotatingFileHandler
@@ -23,12 +24,17 @@ config.read([CONFIG_FILE, SECRETS_FILE_PRIVATE])
 log = logging.getLogger('PrismataBot')
 log.setLevel(logging.DEBUG)
 log_format = '%(asctime)s: %(levelname)s - %(message)s'
-if test_mode:
-    handler = logging.StreamHandler(sys.stdout)
-else:
-    handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
+handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
 handler.setFormatter(logging.Formatter(log_format))
 log.addHandler(handler)
+
+
+# Exception logging
+def log_uncaught_exceptions(ex_cls, ex, tb):
+    log.critical(''.join(format_tb(tb)))
+    log.critical('{0}: {1}'.format(ex_cls, ex))
+
+sys.excepthook = log_uncaught_exceptions
 
 # Config secrets
 if 'Secrets' not in config:
