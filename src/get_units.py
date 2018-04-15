@@ -7,6 +7,7 @@ import sys
 
 from configparser import ConfigParser
 import requests
+import language_check
 
 CONFIG_FILE = '../cfg/config.ini'
 UNIT_INFO_URL = 'https://s3.amazonaws.com/lunarch_blog/Units/public+json.txt'
@@ -22,6 +23,8 @@ console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
 log.addHandler(file_handler)
 log.addHandler(console_handler)
 log.setLevel(logging.DEBUG)
+
+language_tool = language_check.LanguageTool('en-US')
 
 
 def update_units():
@@ -62,6 +65,9 @@ def create_tooltip_from_abilities(unit_name, unit_json):
         tooltip_parts += [click_tooltip]
 
     tooltip = ' - '.join(tooltip_parts)
+    matches = language_tool.check(tooltip)
+    matches = list(filter(lambda x: x.replacements == ['an'], matches))
+    tooltip = language_check.correct(tooltip, matches)
     return tooltip
 
 
