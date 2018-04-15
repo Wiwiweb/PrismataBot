@@ -6,8 +6,7 @@ import requests
 from globals import config, log, test_mode
 from prismata_bot import PrismataBot
 
-TWITCH_ENDPOINT = 'https://api.twitch.tv/kraken/streams?game=Prismata&client_id={}'\
-    .format(config['Secrets']['Twitch_client_id'])
+TWITCH_ENDPOINT = 'https://api.twitch.tv/helix/streams?game_id=488455'
 
 processes = {}
 
@@ -34,10 +33,13 @@ def bot_manager_loop():
 def get_prismata_streams():
     if test_mode:
         return ['wiwiweb']
-    body = requests.get(TWITCH_ENDPOINT).json()
-    if 'streams' not in body:
+    headers = {'Client-ID': config['Secrets']['Twitch_client_id']}
+    body = requests.get(TWITCH_ENDPOINT, headers=headers).json()
+    if 'data' not in body:
         log.error("Twitch API error : {}".format(body))
-    channel_list = [stream['channel']['name'] for stream in body['streams']]
+        return []
+    # Turns "https://static-cdn.jtvnw.net/previews-ttv/live_user_foobar-{width}x{height}.jpg" into "foobar"
+    channel_list = [stream['thumbnail_url'][52:-21] for stream in body['data']]
     return channel_list
 
 
