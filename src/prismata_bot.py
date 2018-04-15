@@ -102,7 +102,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.chat("I don't have anything to say about that FrankerZ I can talk about: {}".format(query_list))
 
     def answer_hello_command(self, username):
-        faces = ['HeyGuys', 'VoHiYo', 'KonCha', 'MrDestructoid', 'OhMyDog', 'FrankerZ', 'RalpherZ']
+        faces = ['HeyGuys', 'VoHiYo', 'KonCha', 'MrDestructoid', 'OhMyDog', 'FrankerZ', 'RalpherZ', 'POGGERS']
         self.chat('@{} {}'.format(username, random.choice(faces)))
 
     def chat(self, message):
