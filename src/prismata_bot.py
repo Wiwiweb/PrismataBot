@@ -22,6 +22,8 @@ tooltip_key_to_name = {**tooltip_key_to_name, **custom_tooltips}  # Merge both d
 
 prismata_responses = json.load(open(config['Files']['prismata_responses']))
 
+emotes = {'goose': 'DuckerZ',
+          'anime': 'KonCha'}
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
@@ -75,7 +77,13 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             log.debug('Closest match: {}->{}->{} with {}'
                       .format(query, tooltip_key, tooltip_name,
                               round(SequenceMatcher(None, query, tooltip_key).ratio(), 2)))
-            self.chat('{}: {}'.format(tooltip_name, tooltips[tooltip_name]))
+            emote = ''
+            if query.startswith('anime'):
+                emote = ' TehePelo'
+            elif query.startswith('goose'):
+                emote = ' DuckerZ'
+
+            self.chat('{}: {}{}'.format(tooltip_name, tooltips[tooltip_name], emote))
         else:
             log.debug('Not found')
             self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
