@@ -232,6 +232,9 @@ def translate_costs(cost):
     if counter['R'] >= 5:
         cost = cost.replace('R', '')
         cost_parts += ['{} Replicase'.format(counter['R'])]
+    if counter['E'] >= 5:
+        cost = cost.replace('E', '')
+        cost_parts += ['{} Energy'.format(counter['E'])]
 
     # Always spell out attack, X is confusing to new players
     if counter['X'] > 0:
@@ -246,30 +249,6 @@ def translate_costs(cost):
     if len(cost) > 0:
         cost_parts = [cost] + cost_parts
     return ' and '.join(cost_parts)
-
-    # if counter['X'] > 0 or counter['G'] >= 5 or counter['B'] >= 5 or counter['R'] >= 5:
-    #     cost_parts = []
-    #     gold_count = re.match(r'\d+', cost)
-    #     if gold_count is not None:
-    #         cost_parts += ['{} Gold'.format(gold_count.group(0))]
-    #     if counter['X'] > 0:
-    #         cost_parts += ['{} Attack'.format(counter['X'])]
-    #     if counter['G'] >= 5:
-    #         cost_parts += ['{} Gaussite'.format(counter['G'])]
-    #     else:
-    #
-    #     if counter['B'] >= 5:
-    #         cost_parts += ['{} Behemium'.format(counter['B'])]
-    #     if counter['R'] >= 5:
-    #         cost_parts += ['{} Replicase'.format(counter['R'])]
-    #
-    #     if len(cost_parts) >= 3:
-    #         translated = '{}, and {}'.format(', '.join(cost_parts[:-1]), cost_parts[-1])
-    #     else:
-    #         translated = ' and '.join(cost_parts)
-    #     return translated
-    # else:
-    #     return cost  # Do not translate
 
 
 if __name__ == '__main__':

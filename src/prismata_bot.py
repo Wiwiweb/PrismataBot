@@ -76,7 +76,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             tooltip_name = tooltip_key_to_name[tooltip_key]
             log.debug('Closest match: {}->{}->{} with {}'
                       .format(query, tooltip_key, tooltip_name,
-                              round(SequenceMatcher(None, query, tooltip_key).ratio(), 2)))
+                              round(SequenceMatcher(None, query.lower(), tooltip_key).ratio(), 2)))
             emote = ''
             if query.startswith('anime'):
                 emote = ' TehePelo'
