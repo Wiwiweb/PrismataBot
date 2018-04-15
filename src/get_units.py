@@ -1,6 +1,8 @@
+from collections import Counter
 import json
 import logging
 from logging.handlers import TimedRotatingFileHandler
+import re
 import sys
 
 from configparser import ConfigParser
@@ -41,7 +43,7 @@ def create_tooltip_from_abilities(unit_name, unit_json):
     print(unit_name)
     tooltip_parts = []
 
-    tooltip_parts += [unit_json['buyCost']]
+    tooltip_parts += [translate_costs(unit_json['buyCost'])]
 
     attributes_tooltip = get_attributes_tooltip(unit_json)
     if len(attributes_tooltip) > 0:
@@ -103,14 +105,15 @@ def get_start_of_turn_tooltip(unit_json, unit_name):
     effects = []
     if 'startTurnScript' in unit_json and len(unit_json['startTurnScript']) > 0:
         effects += get_script_effects(unit_json['startTurnScript'])
-        if 'selfsac' in unit_json['startTurnScript']:
-            effects += ['sacrifice ' + unit_name]
 
     if 'attackForEach' in unit_json:
-        effects += ['gain X for each ' + unit_json['attackForEach'] + ' you own']
+        effects += ['gain 1 Attack for each ' + unit_json['attackForEach'] + ' you own']
 
     if 'goldForEach' in unit_json:
-        effects += ['gain 1 for each ' + unit_json['goldForEach'] + ' you own']
+        effects += ['gain 1g for each ' + unit_json['goldForEach'] + ' you own']
+
+    if 'startTurnScript' in unit_json and 'selfsac' in unit_json['startTurnScript']:
+        effects += ['sacrifice ' + unit_name]
 
     tooltip = None
     if len(effects) > 0:
@@ -125,7 +128,7 @@ def get_click_tooltip(unit_json, unit_name):
     if 'healthCostToClick' in unit_json:
         costs += ['pay ' + str(unit_json['healthCostToClick']) + 'HP']
     if 'abilityCost' in unit_json:
-        costs += ['pay ' + unit_json['abilityCost']]
+        costs += ['pay ' + translate_costs(unit_json['abilityCost'])]
     if 'abilitySac' in unit_json:
         costs += get_sacrifice_effects(unit_json['abilitySac'])
 
@@ -156,7 +159,7 @@ def get_click_tooltip(unit_json, unit_name):
 def get_script_effects(script):
     effects = []
     if 'receive' in script:
-        effects += ['gain ' + script['receive']]
+        effects += ['gain ' + translate_costs(script['receive'])]
     if 'create' in script:
         for create_unit in script['create']:
             number, plural = number_grammar(create_unit['multiplicity'])
@@ -207,6 +210,60 @@ def number_grammar(number):
         number = 'a'
         plural = ''
     return number, plural
+
+
+def translate_costs(cost):
+    counter = Counter(cost)
+    cost_parts = []
+
+    # Spell out resources if there's 5 or more of them to avoid counting
+    if counter['G'] >= 5:
+        cost = cost.replace('G', '')
+        cost_parts += ['{} Gaussite'.format(counter['G'])]
+    if counter['B'] >= 5:
+        cost = cost.replace('B', '')
+        cost_parts += ['{} Behemium'.format(counter['B'])]
+    if counter['R'] >= 5:
+        cost = cost.replace('R', '')
+        cost_parts += ['{} Replicase'.format(counter['R'])]
+
+    # Always spell out attack, X is confusing to new players
+    if counter['X'] > 0:
+        cost = cost.replace('X', '')
+        cost_parts += ['{} Attack'.format(counter['X'])]
+
+    # Spell out gold if it's all alone, "Gain 1 and 1 Attack" looks weird
+    gold_count = re.match(r'^\d+$', cost)
+    if gold_count is not None:
+        cost += 'g'
+
+    if len(cost) > 0:
+        cost_parts = [cost] + cost_parts
+    return ' and '.join(cost_parts)
+
+    # if counter['X'] > 0 or counter['G'] >= 5 or counter['B'] >= 5 or counter['R'] >= 5:
+    #     cost_parts = []
+    #     gold_count = re.match(r'\d+', cost)
+    #     if gold_count is not None:
+    #         cost_parts += ['{} Gold'.format(gold_count.group(0))]
+    #     if counter['X'] > 0:
+    #         cost_parts += ['{} Attack'.format(counter['X'])]
+    #     if counter['G'] >= 5:
+    #         cost_parts += ['{} Gaussite'.format(counter['G'])]
+    #     else:
+    #
+    #     if counter['B'] >= 5:
+    #         cost_parts += ['{} Behemium'.format(counter['B'])]
+    #     if counter['R'] >= 5:
+    #         cost_parts += ['{} Replicase'.format(counter['R'])]
+    #
+    #     if len(cost_parts) >= 3:
+    #         translated = '{}, and {}'.format(', '.join(cost_parts[:-1]), cost_parts[-1])
+    #     else:
+    #         translated = ' and '.join(cost_parts)
+    #     return translated
+    # else:
+    #     return cost  # Do not translate
 
 
 if __name__ == '__main__':
