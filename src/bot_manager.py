@@ -13,8 +13,16 @@ processes = {}
 
 def bot_manager_loop():
     sleep_time = int(config['Twitch']['channel_check_sleep'])
+    error_sleep_time = int(config['Twitch']['twitch_error_sleep'])
+
     while True:
-        channel_set = set(get_prismata_streams())
+        channel_list = get_prismata_streams()
+
+        if channel_list is None:
+            sleep(error_sleep_time)
+            continue
+
+        channel_set = set(channel_list)
         existing_bots_set = set(processes.keys())
         new_channels = channel_set - existing_bots_set
         ended_channels = existing_bots_set - channel_set
@@ -34,13 +42,18 @@ def get_prismata_streams():
     if test_mode:
         return ['wiwiweb']
     headers = {'Client-ID': config['Secrets']['Twitch_client_id']}
-    body = requests.get(TWITCH_ENDPOINT, headers=headers).json()
-    if 'data' not in body:
-        log.error("Twitch API error : {}".format(body))
-        return []
-    # Turns "https://static-cdn.jtvnw.net/previews-ttv/live_user_foobar-{width}x{height}.jpg" into "foobar"
-    channel_list = [stream['thumbnail_url'][52:-21] for stream in body['data']]
-    return channel_list
+    try:
+        r = requests.get(TWITCH_ENDPOINT, headers=headers)
+        body = r.json()
+        if 'data' not in body or 500 <= r.status_code <= 599:
+            log.error("Twitch API {} error : {}".format(r.status_code, body))
+            return None
+        # Turns "https://static-cdn.jtvnw.net/previews-ttv/live_user_foobar-{width}x{height}.jpg" into "foobar"
+        channel_list = [stream['thumbnail_url'][52:-21] for stream in body['data']]
+        return channel_list
+    except requests.exceptions.RequestException as e:
+        log.error("Twitch API request exception: {}".format(e))
+        return None
 
 
 def create_new_bot(channel):

@@ -65,7 +65,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.answer_hello_command(username)
 
     def on_disconnect(self, connection, event):
-        log.info('Disconnected (channel {}'.format(event.target))
+        log.info('Disconnected (channel {})'.format(self.channel))
         log.debug(event)
         raise SystemExit()
 
