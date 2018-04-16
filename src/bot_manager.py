@@ -9,6 +9,7 @@ from prismata_bot import PrismataBot
 TWITCH_ENDPOINT = 'https://api.twitch.tv/helix/streams?game_id=488455'
 
 processes = {}
+bot_lifetimes = {}
 
 
 def bot_manager_loop():
@@ -22,6 +23,8 @@ def bot_manager_loop():
             sleep(error_sleep_time)
             continue
 
+        reset_bot_lifetimes(channel_list)
+
         channel_set = set(channel_list)
         existing_bots_set = set(processes.keys())
         new_channels = channel_set - existing_bots_set
@@ -33,7 +36,7 @@ def bot_manager_loop():
         for new_channel in new_channels:
             create_new_bot(new_channel)
         for ended_channel in ended_channels:
-            terminate_bot(ended_channel)
+            decrement_bot_lifetime(ended_channel)
 
         sleep(sleep_time)
 
@@ -72,12 +75,30 @@ def start_bot(channel):
     bot.start()
 
 
+def reset_bot_lifetimes(channel_list):
+    for channel in channel_list:
+        if channel in bot_lifetimes:
+            log.debug("Bot for channel {} was on lifetime {} but was saved".format(channel, bot_lifetimes[channel]))
+            del bot_lifetimes[channel]
+
+
+def decrement_bot_lifetime(channel):
+    if channel not in bot_lifetimes:
+        bot_lifetimes[channel] = 5
+    else:
+        bot_lifetimes[channel] -= 1
+    log.debug("Bot for channel {} is on lifetime {}".format(channel, bot_lifetimes[channel]))
+    if bot_lifetimes[channel] <= 0:
+        terminate_bot(channel)
+
+
 def terminate_bot(channel):
     log.info("Terminating bot for channel: {}".format(channel))
     process = processes[channel]
     if process.is_alive():
         processes[channel].terminate()
     del processes[channel]
+    del bot_lifetimes[channel]
 
 
 if __name__ == '__main__':
