@@ -25,6 +25,7 @@ prismata_responses = json.load(open(config['Files']['prismata_responses']))
 emotes = {'goose': 'DuckerZ',
           'anime': 'KonCha'}
 
+
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
         channel = '#' + channel
@@ -70,13 +71,14 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         raise SystemExit()
 
     def answer_unit_command(self, query):
-        tooltip_key = get_close_matches(query, tooltip_key_to_name.keys(), 1, 0.4)
+        query_lower = query.lower()
+        tooltip_key = get_close_matches(query_lower, tooltip_key_to_name.keys(), 1, 0.4)
         if tooltip_key:
             tooltip_key = tooltip_key[0]
             tooltip_name = tooltip_key_to_name[tooltip_key]
             log.debug('Closest match: {}->{}->{} with {}'
                       .format(query, tooltip_key, tooltip_name,
-                              round(SequenceMatcher(None, query.lower(), tooltip_key).ratio(), 2)))
+                              round(SequenceMatcher(None, query_lower, tooltip_key).ratio(), 2)))
             emote = ''
             if query.startswith('anime'):
                 emote = ' TehePelo'
