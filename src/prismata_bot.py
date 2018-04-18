@@ -22,9 +22,6 @@ tooltip_key_to_name = {**tooltip_key_to_name, **custom_tooltips}  # Merge both d
 
 prismata_responses = json.load(open(config['Files']['prismata_responses']))
 
-emotes = {'goose': 'DuckerZ',
-          'anime': 'KonCha'}
-
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channel, nickname, server, port, password):
