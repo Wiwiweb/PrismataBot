@@ -7,20 +7,53 @@ import random
 from globals import config, log
 
 tooltips = json.load(open(config['Files']['unit_tooltips']))
-tooltip_key_to_name = {}  # Dictionary of lowercase search terms to actual unit name
+unit_lowercase_to_name = {}  # Dictionary of lowercase unit names to actual unit name
+unit_aliases_to_name = {}    # Dictionary of all lowercase aliases terms to actual unit name
 for tooltip_dict_name in tooltips:
     tooltip_name_lower = tooltip_dict_name.lower()
-    tooltip_key_to_name[tooltip_name_lower] = tooltip_dict_name
+    unit_lowercase_to_name[tooltip_name_lower] = tooltip_dict_name
+    unit_aliases_to_name[tooltip_name_lower] = tooltip_dict_name
     name_parts = tooltip_name_lower.split(' ')
     if len(name_parts) >= 2:
         for name_part in name_parts:
-            if name_part not in tooltip_key_to_name:
-                tooltip_key_to_name[name_part] = tooltip_dict_name
+            if name_part not in unit_aliases_to_name:
+                unit_aliases_to_name[name_part] = tooltip_dict_name
 
 custom_tooltips = json.load(open(config['Files']['custom_tooltip_matches']))
-tooltip_key_to_name = {**tooltip_key_to_name, **custom_tooltips}  # Merge both dictionaries
+unit_aliases_to_name = {**unit_aliases_to_name, **custom_tooltips}  # Merge both dictionaries
 
 prismata_responses = json.load(open(config['Files']['prismata_responses']))
+
+
+def get_unit_match(query):
+    query_lower = query.lower()
+    match = None
+    if len(query_lower) >= 4:
+        match = get_substring_match(query_lower)
+    if match is None:
+        match = get_difflib_match(query_lower)
+    return match
+
+
+def get_substring_match(query):
+    for key in unit_lowercase_to_name.keys():
+        if query in key:
+            unit_name = unit_lowercase_to_name[key]
+            log.debug('Substring match: {}->{}->{}'.format(query, key, unit_name))
+            return unit_name
+    return None
+
+
+def get_difflib_match(query):
+    unit_alias = get_close_matches(query, unit_aliases_to_name.keys(), 1, 0.4)
+    unit_name = None
+    if unit_alias:
+        unit_alias = unit_alias[0]
+        unit_name = unit_aliases_to_name[unit_alias]
+        log.debug('Closest match: {}->{}->{} with {}'
+                  .format(query, unit_alias, unit_name,
+                          round(SequenceMatcher(None, unit_alias, query).ratio(), 2)))
+    return unit_name
 
 
 class PrismataBot(irc.bot.SingleServerIRCBot):
@@ -68,21 +101,15 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         raise SystemExit()
 
     def answer_unit_command(self, query):
-        query_lower = query.lower()
-        tooltip_key = get_close_matches(query_lower, tooltip_key_to_name.keys(), 1, 0.4)
-        if tooltip_key:
-            tooltip_key = tooltip_key[0]
-            tooltip_name = tooltip_key_to_name[tooltip_key]
-            log.debug('Closest match: {}->{}->{} with {}'
-                      .format(query, tooltip_key, tooltip_name,
-                              round(SequenceMatcher(None, query_lower, tooltip_key).ratio(), 2)))
+        unit_match = get_unit_match(query)
+        if unit_match:
             emote = ''
             if query.startswith('anime'):
                 emote = ' TehePelo'
             elif query.startswith('goose'):
                 emote = ' DuckerZ'
 
-            self.chat('{}: {}{}'.format(tooltip_name, tooltips[tooltip_name], emote))
+            self.chat('{}: {}{}'.format(unit_match, tooltips[unit_match], emote))
         else:
             log.debug('Not found')
             self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
