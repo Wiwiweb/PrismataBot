@@ -82,13 +82,10 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             log.info('Answering "{}" in channel {} from user {}'.format(text, self.channel, username))
 
         if text_split[0] == '!prismata':
-            if len(text_split) == 1 or text_split[1] == '':
-                query = 'prismata'
-            else:
-                query = text_split[1]
-            self.answer_prismata_command(query)
+            if len(text_split) == 2:
+                self.answer_prismata_command(text_split[1])
         elif text_split[0] == '!unit':
-            if len(text_split) == 2 and len(text_split[1]) > 0:
+            if len(text_split) == 2:
                 self.answer_unit_command(text_split[1])
             else:
                 self.chat('You need to type a unit name FailFish')
