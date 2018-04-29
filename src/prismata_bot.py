@@ -28,6 +28,10 @@ prismata_responses = json.load(open(config['Files']['prismata_responses']))
 def get_unit_match(query):
     query_lower = query.lower()
     match = None
+    if query_lower in unit_lowercase_to_name:
+        unit_name = unit_lowercase_to_name[query_lower]
+        log.debug('Direct match: {}->{}'.format(query, unit_name))
+        return unit_name
     if len(query_lower) >= 4:
         match = get_substring_match(query_lower)
     if match is None:
