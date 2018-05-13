@@ -105,9 +105,9 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         unit_match = get_unit_match(query)
         if unit_match:
             emote = ''
-            if query.startswith('anime'):
+            if 'anime' in query:
                 emote = ' TehePelo'
-            elif query.startswith('goose'):
+            elif 'goose' in query:
                 emote = ' DuckerZ'
 
             self.chat('{}: {}{}'.format(unit_match, tooltips[unit_match], emote))
