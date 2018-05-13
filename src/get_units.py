@@ -116,7 +116,7 @@ def get_start_of_turn_tooltip(unit_json, unit_name):
         effects += ['gain 1 Attack for each ' + unit_json['attackForEach'] + ' you own']
 
     if 'goldForEach' in unit_json:
-        effects += ['gain 1g for each ' + unit_json['goldForEach'] + ' you own']
+        effects += ['gain 1 gold for each ' + unit_json['goldForEach'] + ' you own']
 
     if 'startTurnScript' in unit_json and 'selfsac' in unit_json['startTurnScript']:
         effects += ['sacrifice ' + unit_name]
