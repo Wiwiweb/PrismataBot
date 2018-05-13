@@ -67,6 +67,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         self.channel = channel
 
     def on_welcome(self, connection, event):
+        log.debug('Connected (channel {})'.format(self.channel))
         connection.cap('REQ', ':twitch.tv/tags')  # Request display-names in messages
         connection.join(self.channel)
 
@@ -99,7 +100,6 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {})'.format(self.channel))
         log.debug(event)
-        raise SystemExit()
 
     def answer_unit_command(self, query):
         unit_match = get_unit_match(query)
