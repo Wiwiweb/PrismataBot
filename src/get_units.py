@@ -244,7 +244,7 @@ def translate_costs(cost):
     # Spell out gold if it's all alone, "Gain 1 and 1 Attack" looks weird
     gold_count = re.match(r'^\d+$', cost)
     if gold_count is not None:
-        cost += 'g'
+        cost += ' gold'
 
     if len(cost) > 0:
         cost_parts = [cost] + cost_parts
