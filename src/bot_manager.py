@@ -1,6 +1,6 @@
 from multiprocessing import Process
 from time import sleep
-
+from json.decoder import JSONDecodeError
 import requests
 
 from globals import config, log, test_mode
@@ -45,17 +45,22 @@ def get_prismata_streams():
     if test_mode:
         return ['wiwiweb']
     headers = {'Client-ID': config['Secrets']['Twitch_client_id']}
+    status_code = None
     try:
         r = requests.get(TWITCH_ENDPOINT, headers=headers)
+        status_code = r.status_code
         body = r.json()
-        if 'data' not in body or 500 <= r.status_code <= 599:
+        if 'data' not in body or 500 <= status_code <= 599:
             log.error("Twitch API {} error : {}".format(r.status_code, body))
             return None
         # Turns "https://static-cdn.jtvnw.net/previews-ttv/live_user_foobar-{width}x{height}.jpg" into "foobar"
         channel_list = [stream['thumbnail_url'][52:-21] for stream in body['data']]
         return channel_list
     except requests.exceptions.RequestException as e:
-        log.error("Twitch API request exception: {}".format(e))
+        log.error("Twitch API request exception (status {}): {}".format(status_code, e))
+        return None
+    except JSONDecodeError as e:
+        log.error("Twitch API request JSONDecodeError (status {}): {}".format(status_code, e))
         return None
 
 
