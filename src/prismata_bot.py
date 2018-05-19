@@ -116,7 +116,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
 
     def answer_prismata_command(self, query):
-        tooltip_key = get_close_matches(query, prismata_responses.keys(), 1, 0.5)
+        tooltip_key = get_close_matches(query, prismata_responses.keys(), 1, 0.6)
         if tooltip_key:
             tooltip_key = tooltip_key[0]
             log.debug('Closest match: {}->{} with {}'
