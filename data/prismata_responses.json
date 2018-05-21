@@ -13,9 +13,8 @@
   "exhaust": "Exhausted units can't do anything. \"Click and Exhaust 2\" means after clicking it, the unit can't do anything this turn and the turn after ResidentSleeper",
   "fragile": "Fragile units (marked with <3 ) can be partially damaged. Normal units have to be killed in one shot",
   "frontline": "Frontline units (marked with a blue target) can be attacked directly by the enemy, without having to go through blockers",
-  "lifespan": "Lifespan units (marked with 💀) will die after a certain number of turns",
+  "lifespan": "Lifespan units (marked with 💀 ) will die after a certain number of turns",
   "stamina": "Units with Stamina can only be clicked a certain number of times",
-  "discord": "discord .gg/prismata",
   "discord link": "discord.gg/prismata",
   "units": "All units: prismata .net/units (Or type '!unit X')",
   "units link": "All units: prismata.net/units (Or type '!unit X')"
