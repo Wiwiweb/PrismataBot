@@ -172,7 +172,7 @@ def get_script_effects(script):
             prompt = ' prompt' if create_unit['buildTime'] == 0 else ''
             create_effect = 'construct ' + number + prompt + ' ' + create_unit['name'] + plural
             if create_unit['buildTime'] > 1:
-                create_effect += ' with Exhaust' + str(create_unit['buildTime'])
+                create_effect += ' with Buildtime' + str(create_unit['buildTime'])
             if create_unit['lifespan'] > 0:
                 if create_unit['buildTime'] > 1:
                     create_effect += ' and'
