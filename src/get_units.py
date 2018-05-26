@@ -145,7 +145,7 @@ def get_click_tooltip(unit_json, unit_name):
 
     if 'targetAction' in unit_json:
         if 'chill' in unit_json['targetAction']:
-            gains += ['chill ' + str(unit_json['targetAmount'])]
+            gains += ['Chill ' + str(unit_json['targetAmount'])]
         elif 'snipe' in unit_json['targetAction']:
             if 'healthAtMost' in unit_json['targetCondition']:
                 health_requirement = unit_json['targetCondition']['healthAtMost']
