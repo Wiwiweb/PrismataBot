@@ -1,8 +1,10 @@
 import json
 from difflib import SequenceMatcher, get_close_matches
+from time import sleep
 
 import irc.bot
 import random
+import os
 
 from globals import config, log
 
@@ -22,7 +24,7 @@ for tooltip_dict_name in tooltips:
 custom_tooltips = json.load(open(config['Files']['custom_tooltip_matches']))
 unit_aliases_to_name = {**unit_aliases_to_name, **custom_tooltips}  # Merge both dictionaries
 
-prismata_responses = json.load(open(config['Files']['prismata_responses']))
+prismata_responses = json.load(open(config['Files']['prismata_responses'], encoding='utf8'))
 
 
 def get_unit_match(query):
@@ -69,6 +71,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
     def on_welcome(self, connection, event):
         log.debug('Connected (channel {})'.format(self.channel))
         connection.cap('REQ', ':twitch.tv/tags')  # Request display-names in messages
+        connection.cap('REQ', ':twitch.tv/commands')  # Request ROOMSTATE and CLEARCHAT updates
         connection.join(self.channel)
 
     def on_join(self, connection, event):
@@ -96,6 +99,10 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
                 self.chat('You need to type a unit name FailFish')
         elif text_split[0] == '@PrismataBot':
             self.answer_hello_command(username)
+
+    def on_clearchat(self, connection, event):
+        if event.arguments[0] == 'prismatabot':
+            log.warning("CLEARCHAT: {}".format(event))
 
     def on_disconnect(self, connection, event):
         log.info('Disconnected (channel {})'.format(self.channel))
