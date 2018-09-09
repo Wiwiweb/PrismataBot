@@ -112,7 +112,7 @@
     "Vivid Drone": "2EE - 1HP - When bought: Consume 2 Drones - Start of turn: Gain 3 gold",
     "Wall": "5B - 3HP Prompt Blocker",
     "Wild Drone": "5EE - 3HP Frontline - Start of turn: Gain 2 gold",
-    "Xaetron": "11GGGGG - 4HP Fragile Prompt Blocker - Start of turn: Gain 4HP (Maximum 12) - Click: Pay 7HP to construct 5 Gauss Charges",
+    "Xaetron": "11 gold and 5 Gaussite - 4HP Fragile Prompt Blocker - Start of turn: Gain 4HP (Maximum 12) - Click: Pay 7HP to construct 5 Gauss Charges",
     "Xeno Guardian": "5GBB - 4HP Blocker - Start of turn: Gain 1 Attack",
     "Zemora Voidbringer": "5GGG - 20HP Fragile Buildtime6 - Click: Pay 8 Gaussite to gain 8 gold and 8 Attack"
 }
