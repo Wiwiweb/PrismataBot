@@ -1,12 +1,12 @@
 import json
+from collections import deque
+from datetime import datetime
 from difflib import SequenceMatcher, get_close_matches
-from time import sleep
+import random
 
 import irc.bot
-import random
-import os
 
-from globals import config, log
+from globals import config, log, chat_log
 
 tooltips = json.load(open(config['Files']['unit_tooltips']))
 unit_lowercase_to_name = {}  # Dictionary of lowercase unit names to actual unit name
@@ -67,6 +67,8 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         channel = '#' + channel
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, password)], nickname, nickname)
         self.channel = channel
+        self.last_chats = deque()
+        self.log_chats_in_x = -1
 
     def on_welcome(self, connection, event):
         log.debug('Connected (channel {})'.format(self.channel))
@@ -86,8 +88,21 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             if tag['key'] == 'display-name':
                 username = tag['value']
 
+        if self.log_chats_in_x >= 0:
+            self.log_chats_in_x -= 1
+
+        message_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.last_chats.append("{} - {}: {}".format(message_time, username, text))
+        if len(self.last_chats) > 11:
+            self.last_chats.popleft()
+        if self.log_chats_in_x == 0:
+            chat_log.info('{}: ================================'.format(self.channel))
+            for chat_line in self.last_chats:
+                chat_log.info(chat_line)
+
         if text.startswith(('!prismata', '!unit', '@PrismataBot')):
             log.info('Answering "{}" in channel {} from user {}'.format(text, self.channel, username))
+            self.log_chats_in_x = 5
 
         if text_split[0] == '!prismata':
             if len(text_split) == 2:

@@ -28,6 +28,12 @@ handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
 handler.setFormatter(logging.Formatter(log_format))
 log.addHandler(handler)
 
+chat_log = logging.getLogger('PrismataBot_chat')
+chat_log.setLevel(logging.INFO)
+log_format = '%(message)s'
+handler = TimedRotatingFileHandler(config['Files']['logfile_chat'], 'midnight')
+handler.setFormatter(logging.Formatter(log_format))
+chat_log.addHandler(handler)
 
 # Exception logging
 def log_uncaught_exceptions(ex_cls, ex, tb):
