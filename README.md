@@ -7,7 +7,7 @@ It is currently running on an AWS EC2 instance using the scripts in the `scripts
 
 ## Commands
 
-`!unit X`: Displays information about unit X. The bot is very lenient with typos and will try to match indivudual words of unit names. For instance, `!unit pahge` will match to "phage" which matches to "Blood Phage".
+`!unit X`: Displays information about unit X. The bot is very lenient with typos and will try to match individual words of unit names. For instance, `!unit pahge` will match to "phage" which matches to "Blood Phage".
 
 `!prismata X`: Displays a pre-coded message about topic X. [Topics and responses can be seen here.](data/prismata_responses.json)
 
