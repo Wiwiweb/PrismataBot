@@ -96,12 +96,16 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         if len(self.last_chats) > 11:
             self.last_chats.popleft()
         if self.log_chats_in_x == 0:
-            chat_log.info('{}: ================================'.format(self.channel))
             for chat_line in self.last_chats:
                 chat_log.info(chat_line)
 
         if text.startswith(('!prismata', '!unit', '@PrismataBot')):
             log.info('Answering "{}" in channel {} from user {}'.format(text, self.channel, username))
+            if self.log_chats_in_x > 0:
+                for chat_line in self.last_chats:
+                    chat_log.info(chat_line)
+            else:
+                chat_log.info('{}: ================================'.format(self.channel))
             self.log_chats_in_x = 5
 
         if text_split[0] == '!prismata':
