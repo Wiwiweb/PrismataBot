@@ -96,16 +96,12 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
         if len(self.last_chats) > 11:
             self.last_chats.popleft()
         if self.log_chats_in_x == 0:
-            for chat_line in self.last_chats:
-                chat_log.info(chat_line)
+            self.log_chat_lines()
 
         if text.startswith(('!prismata', '!unit', '@PrismataBot')):
             log.info('Answering "{}" in channel {} from user {}'.format(text, self.channel, username))
-            if self.log_chats_in_x > 0:
-                for chat_line in self.last_chats:
-                    chat_log.info(chat_line)
-            else:
-                chat_log.info('{}: ================================'.format(self.channel))
+            if self.log_chats_in_x > 0:  # We were already going to print chat logs, print pre-emptively
+                self.log_chat_lines()
             self.log_chats_in_x = 5
 
         if text_split[0] == '!prismata':
@@ -118,6 +114,12 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
                 self.chat('You need to type a unit name FailFish')
         elif text_split[0] == '@PrismataBot':
             self.answer_hello_command(username)
+
+    def log_chat_lines(self):
+        chat_log.info('{}: ================================'.format(self.channel))
+        for chat_line in self.last_chats:
+            chat_log.info(chat_line)
+            self.last_chats = []
 
     def on_clearchat(self, connection, event):
         if event.arguments[0] == 'prismatabot':
