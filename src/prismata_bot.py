@@ -92,7 +92,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.log_chats_in_x -= 1
 
         message_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        self.last_chats.append("{} - {}: {}".format(message_time, username, text))
+        self.last_chats.append("{} {} - {}: {}".format(message_time, self.channel, username, text))
         if len(self.last_chats) > 11:
             self.last_chats.popleft()
         if self.log_chats_in_x == 0:
@@ -100,7 +100,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
 
         if text.startswith(('!prismata', '!unit', '@PrismataBot')):
             log.info('Answering "{}" in channel {} from user {}'.format(text, self.channel, username))
-            if self.log_chats_in_x > 0:  # We were already going to print chat logs, print pre-emptively
+            if self.log_chats_in_x > 0:  # We were already going to print chat logs, print preemptively
                 self.log_chat_lines()
             self.log_chats_in_x = 5
 
@@ -116,7 +116,6 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.answer_hello_command(username)
 
     def log_chat_lines(self):
-        chat_log.info('{}: ================================'.format(self.channel))
         for chat_line in self.last_chats:
             chat_log.info(chat_line)
             self.last_chats = []
