@@ -10,7 +10,7 @@ from globals import config, log, chat_log
 
 tooltips = json.load(open(config['Files']['unit_tooltips']))
 unit_lowercase_to_name = {}  # Dictionary of lowercase unit names to actual unit name
-unit_aliases_to_name = {}    # Dictionary of all lowercase aliases terms to actual unit name
+unit_aliases_to_name = {}  # Dictionary of all lowercase aliases terms to actual unit name
 for tooltip_dict_name in tooltips:
     tooltip_name_lower = tooltip_dict_name.lower()
     unit_lowercase_to_name[tooltip_name_lower] = tooltip_dict_name
@@ -118,7 +118,7 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
     def log_chat_lines(self):
         for chat_line in self.last_chats:
             chat_log.info(chat_line)
-            self.last_chats = []
+            self.last_chats = deque()
 
     def on_clearchat(self, connection, event):
         if event.arguments[0] == 'prismatabot':
