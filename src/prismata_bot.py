@@ -25,6 +25,8 @@ custom_tooltips = json.load(open(config['Files']['custom_tooltip_matches']))
 unit_aliases_to_name = {**unit_aliases_to_name, **custom_tooltips}  # Merge both dictionaries
 
 prismata_responses = json.load(open(config['Files']['prismata_responses'], encoding='utf8'))
+prismata_responses_keys = list(prismata_responses.keys()) + ['commands']
+prismata_displayed_commands = ', '.join(filter(lambda resp: not resp.endswith('link'), prismata_responses.keys()))
 
 
 def get_unit_match(query):
@@ -143,17 +145,19 @@ class PrismataBot(irc.bot.SingleServerIRCBot):
             self.chat("Couldn't find a unit for {} NotLikeThis".format(query))
 
     def answer_prismata_command(self, query):
-        tooltip_key = get_close_matches(query, prismata_responses.keys(), 1, 0.6)
+        tooltip_key = get_close_matches(query, prismata_responses_keys, 1, 0.55)
         if tooltip_key:
             tooltip_key = tooltip_key[0]
             log.debug('Closest match: {}->{} with {}'
                       .format(query, tooltip_key,
                               round(SequenceMatcher(None, query, tooltip_key).ratio(), 2)))
-            self.chat(prismata_responses[tooltip_key])
+            if tooltip_key == 'commands':
+                self.chat("I can talk about: {}".format(prismata_displayed_commands))
+            else:
+                self.chat(prismata_responses[tooltip_key])
         else:
             log.debug('Not found')
-            query_list = ', '.join(prismata_responses.keys())
-            self.chat("I don't have anything to say about that FrankerZ I can talk about: {}".format(query_list))
+            self.chat("I don't have anything to say about that FrankerZ Try one of these: basics, f2p, p2w, rng, defense, sets. `!prismata commands` for the full list of topics")
 
     def answer_hello_command(self, username):
         faces = ['HeyGuys', 'VoHiYo', 'KonCha', 'MrDestructoid', 'OhMyDog', 'FrankerZ', 'RalpherZ', 'POGGERS']

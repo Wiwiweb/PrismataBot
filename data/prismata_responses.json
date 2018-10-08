@@ -1,11 +1,15 @@
 {
-  "prismata": "Prismata is a free strategy/card game hybrid with no RNG, no p2w, and no bullshit. It has deep PvP, actually smart AI opponents, and a single-player story campaign Kreygasm",
+  "help": "Hi, I'm PrismataBot HeyGuys I join all Prismata streams to shill- I mean, inform viewers about Prismata. Try `!prismata <topic>` or `!unit <unit name>`",
+  "prismata": "Prismata is a free strategy/card game hybrid with no RNG, no p2w, and no bullshit. It has deep PvP, actually smart bots, and a single-player story campaign Kreygasm",
   "basics": "Your units are at the bottom, enemy is at the top. You collect resources (bottom left) from drones and buildings to buy an army of attackers (sword) from the available units on the left, then kill all the enemy units SMOrc",
   "f2p": "Prismata's full multiplayer is completely free! Hours of the single player content comes for free too! All paid content is single player or cosmetics only, there is zero p2w bullshit OhMyDog",
   "p2w": "All units are available to all players from the start. You can only grind/pay to unlock skins and emotes SeemsGood",
+  "pvp": "Prismata's multiplayer has been in beta for years, and after thousands of games, the player base is still discovering new strategies, combos, and plays. Google \"Prismata Library\" for new player guides",
+  "rng": "No unit in Prismata has any RNG. This is a deterministic game with perfect information, like chess. Unlike chess, the starting set of units available to both players is random so openings are much less important than on the fly strategy",
   "absorb": "Units must be killed in one shot or they don't die (except Fragile units). If you are attacked for 4 damage, but you have a 5 health Blocker, your Blocker can absorb all 4 damage for free, taking no damage!",
   "defense": "Blocker units (marked with a shield) must be killed first before the other units can be attacked. The defender chooses how to assign damage. But if you have enough attack to kill all Blockers, you BREACH! You get to choose what to kill with your remaining attack SMOrc",
   "sets": "The 11 units of the base set (first tab) are available to buy in every set. The second tab has a set of 5-11 random units, the same for both players. This makes each game different, but still balanced SeemsGood",
+  "noob guides": "Prismata is a hard game BabyRage Google \"Prismata Library\" for beginner strategy. Also \"RuinedShadows Master in a Month\" for ladder tips, and \"Msven Youtube\" for advanced strategy videos",
   "in 60 seconds": "Prismata in 60 Seconds: youtube .com/watch?v=GMxI3Hbd-Ko",
   "in 60 seconds link": "Prismata in 60 Seconds: youtube.com/watch?v=GMxI3Hbd-Ko",
   "blocker": "Blocker units (marked with a shield) must be killed first before the other units can be attacked. Blockers only block when they are not clicked (Clicked blockers are marked with a grey shield)",
@@ -17,6 +21,7 @@
   "stamina": "Units with Stamina can only be clicked a certain number of times",
   "discord": "discord .gg/prismata",
   "discord link": "discord.gg/prismata",
-  "units": "All units: prismata .net/units (Or type '!unit X')",
-  "units link": "All units: prismata.net/units (Or type '!unit X')"
+  "units": "All units: prismata .net/units (Or type `!unit <unit name>`)",
+  "units link": "All units: prismata.net/units (Or type `!unit <unit name>`)",
+  "prismatabot": "You wanna know about me? I was created by a Prismata fan, so don't sue Lunarch Studios for anything I say! You can find my code on GitHub! MrDestructoid"
 }
