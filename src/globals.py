@@ -3,6 +3,7 @@ import sys
 from traceback import format_tb
 
 from configparser import ConfigParser
+from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 import boto3
 from botocore.exceptions import NoCredentialsError
@@ -24,7 +25,7 @@ config.read([CONFIG_FILE, SECRETS_FILE_PRIVATE])
 log = logging.getLogger('PrismataBot')
 log.setLevel(logging.DEBUG)
 log_format = '%(asctime)s: %(levelname)s - %(message)s'
-handler = TimedRotatingFileHandler(config['Files']['logfile'], 'midnight')
+handler = StreamHandler(sys.stdout)
 handler.setFormatter(logging.Formatter(log_format))
 log.addHandler(handler)
 
