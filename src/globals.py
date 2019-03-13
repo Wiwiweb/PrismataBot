@@ -1,12 +1,11 @@
 import logging
+import os
 import sys
 from traceback import format_tb
 
 from configparser import ConfigParser
 from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
-import boto3
-from botocore.exceptions import NoCredentialsError
 
 # Test mode
 if len(sys.argv) > 1 and '--test' in sys.argv:
@@ -48,12 +47,9 @@ if 'Secrets' not in config:
     config.add_section('Secrets')
 if not config['Secrets']['IRC_password']:
     try:
-        ssm = boto3.client('ssm', region_name=config['AWS']['region'])
-        response = ssm.get_parameters(Names=['IRC_password', 'Twitch_client_id'],
-                                      WithDecryption=True)
-        config.set('Secrets', 'IRC_password', response['Parameters'][0]['Value'])
-        config.set('Secrets', 'Twitch_client_id', response['Parameters'][1]['Value'])
-        log.info("Secrets loaded from SSM")
-    except NoCredentialsError:
+        config.set('Secrets', 'IRC_password', os.environ['IRC_PASSWORD'])
+        config.set('Secrets', 'Twitch_client_id', os.environ['TWITCH_CLIENT_ID'])
+        log.info("Secrets loaded from env vars")
+    except KeyError:
         log.error("Couldn't load secrets!")
         raise SystemExit()

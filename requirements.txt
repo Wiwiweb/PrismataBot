@@ -1,4 +1,3 @@
-boto3
 configparser
 irc
 language_check
