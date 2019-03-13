@@ -1,1 +1,1 @@
-web: cd src && python bot_manager.py
+bot: cd src && python bot_manager.py
